@@ -21,7 +21,7 @@ static void	load_texture(t_game *game, t_img *img, char *path)
 	if (!img->img)
 	{
 		ft_putstr_fd("Error\n", 2);
-		ft_putstr_fd("Failed to load texture: ", 2);
+		ft_putstr_fd("to load texture: ", 2);
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd("\n", 2);
 		free_game(game);
