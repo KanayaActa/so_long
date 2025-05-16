@@ -12,6 +12,7 @@
 
 NAME		:= so_long
 NAME_BONUS	:= so_long_bonus
+NAME_3D		:= so_long_3d
 
 FT_DIR		:= ./libft
 LIBFT		:= $(FT_DIR)/libft.a
@@ -35,6 +36,22 @@ SRCS		:= \
 	game_events.c \
 	utils.c
 
+# 3D版のソースファイル
+SRCS_3D		:= \
+	so_long_main_3d.c \
+	map_utils.c \
+	map_validation.c \
+	player.c \
+	game_draw.c \
+	textures.c \
+	utils.c \
+	so_long_vector.c \
+	so_long_matrix.c \
+	so_long_projection.c \
+	so_long_draw_3d.c \
+	so_long_camera.c \
+	so_long_events_3d.c
+
 OBJS		:= $(addprefix $(OBJS_DIR)/, $(SRCS:.c=.o))
 
 # ボーナス用のソースファイル（基本的に同じだが、必要に応じて変更可能）
@@ -50,7 +67,10 @@ SRCS_BONUS	:= \
 
 OBJS_BONUS	:= $(addprefix $(OBJS_DIR)/bonus/, $(SRCS_BONUS:.c=.o))
 
-.PHONY: all clean fclean re bonus
+# 3D版のオブジェクトファイル
+OBJS_3D		:= $(addprefix $(OBJS_DIR)/3d/, $(SRCS_3D:.c=.o))
+
+.PHONY: all clean fclean re bonus 3d
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
 
@@ -77,13 +97,23 @@ $(OBJS_DIR)/bonus/%.o: $(SRCS_DIR)/%.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -D BONUS=1 -c $< -o $@
 
+# 3D版のターゲット
+3d: $(LIBFT) $(MLX_LIB) $(NAME_3D)
+
+$(NAME_3D): $(OBJS_3D) $(LIBFT) $(MLX_LIB)
+	$(CC) $(CFLAGS) -D MODE_3D=1 -o $(NAME_3D) $(OBJS_3D) $(LIBFT) $(MLXFLAGS)
+
+$(OBJS_DIR)/3d/%.o: $(SRCS_DIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -D MODE_3D=1 -c $< -o $@
+
 clean:
 	$(RM) -r $(OBJS_DIR)
 	$(MAKE) clean -C $(FT_DIR)
 	$(MAKE) clean -C $(MLX_DIR)
 
 fclean: clean
-	$(RM) $(NAME) $(NAME_BONUS)
+	$(RM) $(NAME) $(NAME_BONUS) $(NAME_3D)
 	$(MAKE) fclean -C $(FT_DIR)
 
 re: fclean all

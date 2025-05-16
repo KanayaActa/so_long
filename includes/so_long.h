@@ -55,6 +55,23 @@ Controls:\n \
 # define KEY_A      97
 # define KEY_S      115
 # define KEY_D      100
+# define KEY_Q      113
+# define KEY_E      101
+# define KEY_P      112
+# define KEY_UP     65362
+# define KEY_DOWN   65364
+# define KEY_LEFT   65361
+# define KEY_RIGHT  65363
+# define KEY_PLUS   61
+# define KEY_MINUS  45
+# define KEY_SPACE  32
+
+# define PROJECTION_ISOMETRIC 0
+# define PROJECTION_PERSPECTIVE 1
+
+# define CAMERA_ROTATION_ANGLE 5
+# define CAMERA_ZOOM_STEP 1
+# define CAMERA_POSITION_STEP 1.0
 
 # define EMPTY '0'
 # define WALL '1'
@@ -63,11 +80,49 @@ Controls:\n \
 # define PLAYER 'P'
 # define ENEMY 'X'
 
+typedef struct s_vector3
+{
+	double	x;
+	double	y;
+	double	z;
+}	t_vector3;
+
+typedef struct s_vector4
+{
+	double	x;
+	double	y;
+	double	z;
+	double	w;
+}	t_vector4;
+
+typedef struct s_matrix4x4
+{
+	double	m[4][4];
+}	t_matrix4x4;
+
 typedef struct s_point
 {
 	int	x;
 	int	y;
+	int	color;
 }	t_point;
+
+typedef struct s_camera
+{
+	t_vector3	position;
+	double		zoom;
+	double		x_angle;
+	double		y_angle;
+	double		z_angle;
+	int			x_offset;
+	int			y_offset;
+	t_vector3	target;
+	t_vector3	up;
+	double		fov;
+	double		aspect_ratio;
+	double		near;
+	double		far;
+}	t_camera;
 
 typedef struct s_player
 {
@@ -77,6 +132,7 @@ typedef struct s_player
 	int		collectibles;
 	int		total_collectibles;
 	int		has_exit;
+	t_vector3	position_3d;
 }	t_player;
 
 typedef struct s_map
@@ -121,6 +177,13 @@ typedef struct s_game
 	t_player	player;
 	t_textures	textures;
 	int			game_over;
+	
+	// 3D関連
+	t_camera	camera;
+	t_matrix4x4	projection;
+	t_matrix4x4	view;
+	int			projection_mode;
+	double		**height_map;
 }	t_game;
 
 /* Main functions */
@@ -158,6 +221,35 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color);
 void	setup_hooks(t_game *game);
 int		key_press(int keycode, void *param);
 int		close_window(void *param);
+
+/* 3D functions */
+void	init_3d(t_game *game);
+void	init_camera(t_game *game);
+void	reset_camera(t_game *game);
+void	convert_2d_to_3d_map(t_game *game);
+void	draw_3d_map(t_game *game);
+void	draw_3d_player(t_game *game);
+void	draw_3d_collectibles(t_game *game);
+void	draw_3d_exit(t_game *game);
+void	draw_3d_enemies(t_game *game);
+t_point	project(t_vector3 v, t_game *game);
+t_point	isometric_projection(t_vector3 v, t_game *game);
+t_point	perspective_projection(t_vector3 v, t_game *game);
+t_vector3	rotate(t_vector3 v, t_camera *cam);
+void	draw_line(t_game *game, t_point p0, t_point p1, int color);
+void	draw_circle(t_game *game, t_point center, int radius, int color);
+
+/* Matrix and Vector functions */
+t_matrix4x4	matrix_multiply(t_matrix4x4 m1, t_matrix4x4 m2);
+t_vector4	matrix_vector_multiply(t_matrix4x4 m, t_vector4 v);
+t_vector4	vector3_to_vector4(t_vector3 v);
+void	matrix4x4_zero(t_matrix4x4 *m);
+t_vector3	vector_normalize(t_vector3 v);
+t_vector3	vector_subtract(t_vector3 v1, t_vector3 v2);
+t_vector3	vector_cross(t_vector3 v1, t_vector3 v2);
+double	vector_dot(t_vector3 v1, t_vector3 v2);
+t_matrix4x4	look_at(t_vector3 eye, t_vector3 target, t_vector3 up);
+t_matrix4x4	perspective(double fov, double aspect, double near, double far);
 
 /* Utility functions */
 void	check_alloc_error(void *ptr);
