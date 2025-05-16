@@ -5,12 +5,13 @@
 #                                                     +:+ +:+         +:+      #
 #    By: miwasa <miwasa@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/11/26 21:38:04 by miwasa            #+#    #+#              #
-#    Updated: 2024/11/30 14:18:40 by miwasa           ###   ########.fr        #
+#    Created: 2025/05/17 04:05:51 by miwasa            #+#    #+#              #
+#    Updated: 2025/05/17 04:05:51 by miwasa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		:= so_long
+NAME_BONUS	:= so_long_bonus
 
 FT_DIR		:= ./libft
 LIBFT		:= $(FT_DIR)/libft.a
@@ -25,33 +26,31 @@ CFLAGS		:= -Wall -Wextra -Werror -I$(INCS_DIR) -I$(FT_DIR) -I$(MLX_DIR) -g
 MLXFLAGS	:= -L$(MLX_DIR) -lmlx -lm -L/usr/X11/lib -lXext -lX11
 
 SRCS		:= \
-	main.c \
-	is_valid_args.c \
-	option_help.c \
-	init_mlx.c \
-	init_map.c \
-	init_camera.c \
-	read_map.c \
-	open_file.c \
-	fill_map.c \
-	check_alloc_error.c \
-	set_z_value.c \
-	project.c \
-	matrix.c \
-	transform.c \
-	draw.c \
-	mlx_hooks.c \
-	events.c \
-	move_camera.c \
-	vector.c \
-	color.c \
-	free_utils.c \
-	my_mlx_pixel_put.c \
-	draw_utils.c
+	so_long_main.c \
+	map_utils.c \
+	map_validation.c \
+	player.c \
+	game_draw.c \
+	textures.c \
+	game_events.c \
+	utils.c
 
 OBJS		:= $(addprefix $(OBJS_DIR)/, $(SRCS:.c=.o))
 
-.PHONY: all clean fclean re
+# ボーナス用のソースファイル（基本的に同じだが、必要に応じて変更可能）
+SRCS_BONUS	:= \
+	so_long_main.c \
+	map_utils.c \
+	map_validation.c \
+	player.c \
+	game_draw.c \
+	textures.c \
+	game_events.c \
+	utils.c
+
+OBJS_BONUS	:= $(addprefix $(OBJS_DIR)/bonus/, $(SRCS_BONUS:.c=.o))
+
+.PHONY: all clean fclean re bonus
 
 all: $(LIBFT) $(MLX_LIB) $(NAME)
 
@@ -68,13 +67,23 @@ $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# ボーナスターゲット
+bonus: $(LIBFT) $(MLX_LIB) $(NAME_BONUS)
+
+$(NAME_BONUS): $(OBJS_BONUS) $(LIBFT) $(MLX_LIB)
+	$(CC) $(CFLAGS) -D BONUS=1 -o $(NAME_BONUS) $(OBJS_BONUS) $(LIBFT) $(MLXFLAGS)
+
+$(OBJS_DIR)/bonus/%.o: $(SRCS_DIR)/%.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -D BONUS=1 -c $< -o $@
+
 clean:
 	$(RM) -r $(OBJS_DIR)
 	$(MAKE) clean -C $(FT_DIR)
 	$(MAKE) clean -C $(MLX_DIR)
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) $(NAME_BONUS)
 	$(MAKE) fclean -C $(FT_DIR)
 
 re: fclean all
