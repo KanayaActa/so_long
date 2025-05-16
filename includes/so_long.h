@@ -158,6 +158,20 @@ typedef struct s_img
 	int		height;
 }	t_img;
 
+typedef struct s_line_vars
+{
+	int		dx;
+	int		dy;
+	int		steps;
+	double	x_increment;
+	double	y_increment;
+	double	x;
+	double	y;
+	int		i;
+	double	t;
+	int		color;
+}	t_line_vars;
+
 typedef struct s_textures
 {
 	t_img	wall;
@@ -232,6 +246,8 @@ void	draw_3d_player(t_game *game);
 void	draw_3d_collectibles(t_game *game);
 void	draw_3d_exit(t_game *game);
 void	draw_3d_enemies(t_game *game);
+void	draw_3d_game(t_game *game);
+void	setup_hooks_3d(t_game *game);
 t_point	project(t_vector3 v, t_game *game);
 t_point	isometric_projection(t_vector3 v, t_game *game);
 t_point	perspective_projection(t_vector3 v, t_game *game);
